@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/rick/source/chip8-emu/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

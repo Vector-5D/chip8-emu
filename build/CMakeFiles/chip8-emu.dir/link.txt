@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/chip8-emu.dir/link.d "CMakeFiles/chip8-emu.dir/src/Chip8.cpp.o" "CMakeFiles/chip8-emu.dir/src/Platform.cpp.o" "CMakeFiles/chip8-emu.dir/src/main.cpp.o" -o /home/rick/source/chip8-emu/bin/chip8-emu  /usr/lib/libSDL3.so.0.4.2
