@@ -1,0 +1,3 @@
+/home/rick/source/chip8-emu/build/CMakeFiles/chip8-emu.dir
+/home/rick/source/chip8-emu/build/CMakeFiles/edit_cache.dir
+/home/rick/source/chip8-emu/build/CMakeFiles/rebuild_cache.dir
