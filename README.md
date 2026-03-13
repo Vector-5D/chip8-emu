@@ -1,5 +1,5 @@
 # Chip-8 Emulator
-An emulator (interpreter) for the Chip-8 virtual machine.
+An emulator (interpreter) for the CHIP-8 programming language.
 
 Usage:
 ```bash
