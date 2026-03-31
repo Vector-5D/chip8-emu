@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
         if (dt > cycle_delay) {
             last_cycle_time = current_time;
             chip8.cycle();
-            platform.update(chip8.video, video_pitch);
+            platform.update(chip8.video, video_pitch, chip8.sound_timer);
         }
     }
 

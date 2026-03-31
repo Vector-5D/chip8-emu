@@ -1,15 +1,34 @@
 #include "Platform.hpp"
+#include <SDL3/SDL_audio.h>
 
 Platform::Platform(
     char const* title,
     int w_width,   int w_height,
     int tex_width, int tex_height)
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+        std::exit(EXIT_FAILURE);
+    }
+
+    if (!SDL_Init(SDL_INIT_AUDIO)) {
+        SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+        std::exit(EXIT_FAILURE);
+    }
 
     window = SDL_CreateWindow(title, w_width, w_height, 0);
 
+    if (!window) {
+        SDL_Log("Unable to create window: %s", SDL_GetError());
+        std::exit(EXIT_FAILURE);
+    }
+
     renderer = SDL_CreateRenderer(window, nullptr);
+
+    if (!renderer) {
+        SDL_Log("Unable to create renderer: %s", SDL_GetError());
+        std::exit(EXIT_FAILURE);
+    }
 
     texture = SDL_CreateTexture(
         renderer,
@@ -18,20 +37,49 @@ Platform::Platform(
         tex_width,
         tex_height);
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+
+    spec.freq = SAMPLE_RATE;
+    spec.format = SDL_AUDIO_F32;
+    spec.channels = 1;
+
+    audio_device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec);
+    stream = SDL_CreateAudioStream(&spec, &spec);
+
+    SDL_BindAudioStream(audio_device, stream);
+
+    freq = 440.0f;
+    phase = 0.0f;
+
+    for (int i = 0; i < SAMPLE_RATE; i++) {
+        buffer[i] = sinf(phase * 2.0f * M_PI);
+        phase += freq / SAMPLE_RATE;
+    }
+
+    SDL_PutAudioStreamData(stream, buffer, sizeof(buffer));
 }
 
 Platform::~Platform() {
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    SDL_DestroyAudioStream(stream);
+    SDL_CloseAudioDevice(audio_device);
     SDL_Quit();
 }
 
-void Platform::update(void const* buffer, int pitch) {
+void Platform::update(void const* buffer, int pitch, uint8_t sound_timer) {
     SDL_UpdateTexture(texture, nullptr, buffer, pitch);
     SDL_RenderClear(renderer);
     SDL_RenderTexture(renderer, texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
+
+    bool paused = SDL_AudioDevicePaused(audio_device);
+
+    if (paused && sound_timer > 0) {
+        SDL_ResumeAudioDevice(audio_device);
+    } else if (!paused && sound_timer <= 0) {
+        SDL_PauseAudioDevice(audio_device);
+    }
 }
 
 bool Platform::processInput(uint8_t* keys) {
