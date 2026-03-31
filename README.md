@@ -1,4 +1,4 @@
-- Chip-8 Emulator
+# Chip-8 Emulator
 An emulator (interpreter) for the Chip-8 virtual machine.
 
 Usage:
